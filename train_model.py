@@ -74,15 +74,13 @@ def main():
                 epochs=25, 
                 verbose=0, 
                 validation_split=.2,
-                # validation_data=(images, labels),
                 shuffle=False, 
                 validation_freq=5,
         )
 
         # saving model
         current_dir = os.getcwd()
-        print(current_dir)
-
+        model.save(current_dir + "/model")
 
 
 main()

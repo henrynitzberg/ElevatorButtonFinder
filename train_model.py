@@ -20,14 +20,14 @@ def get_data(data_dir, image_dims):
                 if label == "button":
                         for image in os.listdir(data_dir + "/" + label):
                                 image = cv.imread(data_dir + "/" + label + "/" + image)
-                                image - cv.cvtColor(image, cv.COLOR_BGR2RGB)
+                                image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
                                 image = cv.resize(image, image_dims)
                                 images.append(image)
                                 labels.append(1)
                 elif label == "not_button":
                         for image in os.listdir(data_dir + "/" + label):
                                 image = cv.imread(data_dir + "/" + label + "/" + image)
-                                image - cv.cvtColor(image, cv.COLOR_BGR2RGB)
+                                image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
                                 image = cv.resize(image, image_dims)
                                 images.append(image)
                                 labels.append(0)
@@ -80,8 +80,8 @@ def main():
 
 
         # print accuracy and loss
-        print("Accuracy: " + str(model.evaluate(images, labels, verbose=0)[1])[0:6])
-        print("Loss: " + str(model.evaluate(images, labels, verbose=0)[0])[0:6])
+        print("Accuracy: " + str(model.evaluate(images, labels, verbose=0)[1]))
+        print("Loss: " + str(model.evaluate(images, labels, verbose=0)[0]))
 
         # saving model
         print("Save Model? (y/n)")

@@ -13,7 +13,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 
-def get_data(image_dims, data_dir):
+def get_data(data_dir, image_dims):
         images = []
         labels = [] # buttons = 1, not buttons = 0
         for label in os.listdir(data_dir):
@@ -38,10 +38,9 @@ def get_data(image_dims, data_dir):
 
 def main():
         # loading data
-        data_dir = "data"
-        image_dims = (128, 128)
-        images, labels = get_data(image_dims, data_dir)
+        images, labels = get_data("data", (128, 128))
 
+        # TODO: delete
         print("Found " + str(len(images)) + " images of " + str(max(labels) + 1) + " classes ")
 
         # TODO: Consider Data augmentation
@@ -49,7 +48,7 @@ def main():
         # creating the model
         # The layers are as follows:
         # Convolution -> Max Pooling -> Convolution -> Max Pooling ->
-        # Dense -> Dense 
+        # Dense -> Output 
         model = keras.Sequential([
                 layers.Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 3)),
                 layers.MaxPooling2D(2, 2),
@@ -60,32 +59,30 @@ def main():
                 layers.Dense(1, activation='sigmoid') # output layer; must be sigmoid
         ])
 
-        #printing model summary
-        model.summary()
-        
+        # compiling the model
         model.compile(
                 optimizer=keras.optimizers.Adam(learning_rate=.001),
                 loss=keras.losses.BinaryCrossentropy(),
                 metrics=keras.metrics.BinaryAccuracy()
         )
 
+        # training model on data
         model.fit(
                 images,
                 labels,
                 batch_size=30,
                 epochs=25, 
-                verbose=2, 
+                verbose=0, 
                 validation_split=.2,
                 # validation_data=(images, labels),
                 shuffle=False, 
                 validation_freq=5,
         )
 
+        # saving model
+        current_dir = os.getcwd()
+        print(current_dir)
 
-        # training model on data, and augmented data
 
-        # testing model on testing data
-
-        # if model is good enough, save it
 
 main()

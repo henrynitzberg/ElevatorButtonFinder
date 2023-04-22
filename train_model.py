@@ -78,9 +78,10 @@ def main():
                 validation_freq=5,
         )
 
+
         # print accuracy and loss
-        print("Accuracy: " + str(model.evaluate(images, labels, verbose=0)[1]))
-        print("Loss: " + str(model.evaluate(images, labels, verbose=0)[0]))
+        print("Accuracy: " + str(model.evaluate(images, labels, verbose=0)[1])[0:6])
+        print("Loss: " + str(model.evaluate(images, labels, verbose=0)[0])[0:6])
 
         # saving model
         print("Save Model? (y/n)")

@@ -7,7 +7,7 @@ import cv2 as cv
 
 import numpy as np
 
-# import silence_tensorflow.auto # silence unnecessary warnings
+import silence_tensorflow.auto # silence unnecessary warnings
 
 import tensorflow as tf
 from tensorflow import keras
@@ -72,15 +72,31 @@ def main():
                 labels,
                 batch_size=30,
                 epochs=25, 
-                verbose=2, 
+                verbose=0, 
                 validation_split=.2,
                 shuffle=False, 
                 validation_freq=5,
         )
 
+        # print accuracy and loss
+        print("Accuracy: " + str(model.evaluate(images, labels, verbose=0)[1]))
+        print("Loss: " + str(model.evaluate(images, labels, verbose=0)[0]))
+
         # saving model
-        current_dir = os.getcwd()
-        model.save(current_dir + "/model")
+        print("Save Model? (y/n)")
+        while (True):
+                answer = input()
+                if answer == "y":
+                        current_dir = os.getcwd()
+                        model.save(current_dir + "/model")
+                        print("Model saved as " + current_dir + "/model")
+                        break
+                elif answer == "n":
+                        print("Model not saved")
+                        break
+                else:
+                        print("Invalid input")
+        
 
 
 main()

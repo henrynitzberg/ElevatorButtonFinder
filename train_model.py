@@ -72,7 +72,7 @@ def main():
                 labels,
                 batch_size=30,
                 epochs=25, 
-                verbose=0, 
+                verbose=2, 
                 validation_split=.2,
                 shuffle=False, 
                 validation_freq=5,

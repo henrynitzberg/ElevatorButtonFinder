@@ -32,7 +32,9 @@ def main():
 
         selective_search = cv.ximgproc.segmentation.createSelectiveSearchSegmentation() # thanks again, google
         selective_search.setBaseImage(image)
-        selective_search.switchToSelectiveSearchQuality() #quality seems to perform better than fast search
+
+         #quality seems to outperform fast search
+        selective_search.switchToSelectiveSearchQuality()
 
         recommended_boxes = selective_search.process()
         # shape: (x, y, w, h)
@@ -40,7 +42,9 @@ def main():
         to_check_coords = []
         for x, y, w, h in recommended_boxes:
                 # adding recommended regions as images to array
-                if int(w / h * 10) in range(7, 13):
+                if int(w / h * 10) in range(6, 14) \
+                and w < image.shape[1] / 2 and h < image.shape[0] / 2 \
+                and w > image.shape[1] / 10 and h > image.shape[0] / 10:
                         box = image[y:y+h, x:x+w]
                         box = cv.resize(box, (128, 128))
                         to_check.append(box)
@@ -48,6 +52,7 @@ def main():
 
         to_check = np.array(to_check, dtype="float32")
 
+        # loading model
         curr_path = os.getcwd()
         model = keras.models.load_model(curr_path + "/model")
         predictions = model.predict(to_check)
@@ -62,11 +67,15 @@ def main():
         num_buttons = 0
         center_points = []
         for pred in pred_list:
-                if pred >= .6:
+                if pred >= .9:
                         x, y, w, h = to_check_coords[pred_list.index(pred)]
+
+                        # rectangle around button guesses - good for debugging
+                        # cv.rectangle(image, (x, y), (x+w, y+h), (255, 0, 0), 1) 
+
+                        # center point of button guesses - used for kmeans below
                         center_points.append([x + w/2, y + h/2])
                         num_buttons += 1
-                        # cv.rectangle(image, (x, y), (x+w, y+h), (255, 0, 0), 1) # rectangle around button guesses
 
         #pullng out center points of all boxes
         center_points = np.array(center_points, dtype="float32")
@@ -78,7 +87,7 @@ def main():
 
         print("num_predicted_buttons: " + str(num_buttons))
         for x, y in centers:
-                cv.circle(image, (int(x), int(y)), 10, (0, 0, 255), -1)
+                cv.circle(image, (int(x), int(y)), 5, (0, 0, 255), -1)
 
         plt.imshow(image)
         plt.show()

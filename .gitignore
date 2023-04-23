@@ -1,3 +1,11 @@
 temp*
 push.sh
 tf_env_command
+data_bin
+data_mult
+
+# temp
+modelv2
+train_mult_class.py
+findButtonsV2.py
+mult_proj(fail)

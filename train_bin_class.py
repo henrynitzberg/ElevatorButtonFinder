@@ -42,6 +42,7 @@ def get_data(data_dir, image_dims):
 
 
 def augment_image(image):
+        # random rotation
         angle = random.randint(-20, 20)
         matrix = cv.getRotationMatrix2D((image.shape[1] / 2, image.shape[0] / 2), angle, 1)
         augmented_image = cv.warpAffine(image, matrix, (image.shape[1], image.shape[0]))
@@ -52,7 +53,13 @@ def augment_image(image):
         if flip is not None:
                 augmented_image = cv.flip(image, flip)
 
-        # TODO: other augmentations
+        # random brightness
+        brightness = random.randint(-50, 50)
+        augmented_image = cv.addWeighted(augmented_image, 1, np.zeros(augmented_image.shape, augmented_image.dtype), 0, brightness) #thanks AI!
+
+        # random contrast
+        contrast = random.randint(-50, 50)
+        augmented_image = cv.addWeighted(augmented_image, 1 + contrast / 100, np.zeros(augmented_image.shape, augmented_image.dtype), 0, 0) #thanks AI!
 
         cv.resize(augmented_image, (128, 128))
         return augmented_image
@@ -60,7 +67,7 @@ def augment_image(image):
 
 def main():
         # loading data
-        images, labels = get_data("data", (128, 128))
+        images, labels = get_data("data_bin", (128, 128))
         print("Found " + str(len(images)) + " images of " + str(max(labels) + 1) + " classes ")
 
         # data augmentation (~50 samples -> 1000 samples)
@@ -95,7 +102,7 @@ def main():
 
         # compiling the model
         model.compile(
-                optimizer=keras.optimizers.Adam(learning_rate=.001),
+                optimizer=keras.optimizers.Adam(learning_rate=.0008),
                 loss=keras.losses.BinaryCrossentropy(),
                 metrics=keras.metrics.BinaryAccuracy()
         )
@@ -107,7 +114,7 @@ def main():
                 labels,
                 batch_size=16,
                 epochs=25, 
-                verbose=0, 
+                verbose=2, 
                 validation_split=.2,
                 shuffle=False, 
                 validation_freq=5,

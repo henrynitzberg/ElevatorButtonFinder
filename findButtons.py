@@ -32,8 +32,7 @@ def main():
 
         selective_search = cv.ximgproc.segmentation.createSelectiveSearchSegmentation() # thanks again, google
         selective_search.setBaseImage(image)
-        # selective_search.switchToSelectiveSearchFast()
-        selective_search.switchToSelectiveSearchQuality() # TODO: try both and examine results
+        selective_search.switchToSelectiveSearchQuality() #quality seems to perform better than fast search
 
         recommended_boxes = selective_search.process()
         # shape: (x, y, w, h)
@@ -61,20 +60,27 @@ def main():
         pred_list = [pred[0] for pred in pred_list]
 
         num_buttons = 0
+        center_points = []
         for pred in pred_list:
                 if pred >= .6:
-                        num_buttons += 1
                         x, y, w, h = to_check_coords[pred_list.index(pred)]
-                        cv.rectangle(image, (x, y), (x+w, y+h), (255, 0, 0), 1)
-        print("num_predicted_buttons: " + str(num_buttons))
+                        center_points.append([x + w/2, y + h/2])
+                        num_buttons += 1
+                        # cv.rectangle(image, (x, y), (x+w, y+h), (255, 0, 0), 1) # rectangle around button guesses
 
-        max_predict = max(pred_list)
-        print(max_predict)
-        max_pred_index = pred_list.index(max_predict)
-        x, y, w, h = to_check_coords[max_pred_index]
-        cv.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 1)
+        #pullng out center points of all boxes
+        center_points = np.array(center_points, dtype="float32")
+
+        # totally ripped from tutorial (kmeans clustering to find predicted location of buttons)
+        criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+        ret,label,centers=cv.kmeans(center_points,2,None,criteria,10,cv.KMEANS_RANDOM_CENTERS)
+        centes = centers.tolist()
+
+        print("num_predicted_buttons: " + str(num_buttons))
+        for x, y in centers:
+                cv.circle(image, (int(x), int(y)), 10, (0, 0, 255), -1)
+
         plt.imshow(image)
         plt.show()
-
 
 main()

@@ -38,10 +38,15 @@ def main():
         recommended_boxes = selective_search.process()
         # shape: (x, y, w, h)
         to_check = []
+        to_check_coords = []
         for x, y, w, h in recommended_boxes:
-                box = image[y:y+h, x:x+w]
-                box = cv.resize(box, (128, 128))
-                to_check.append(box)
+                # adding recommended regions as images to array
+                # buttons will be somewhat square TODO: doesn't workz
+                if int(w / h * 10) in range(4, 16):
+                        box = image[y:y+h, x:x+w]
+                        box = cv.resize(box, (128, 128))
+                        to_check.append(box)
+                        to_check_coords.append([x, y, w, h])
 
         to_check = np.array(to_check, dtype="float32")
 
@@ -51,10 +56,23 @@ def main():
 
         # max prediction should be the button
         pred_list = predictions.tolist()
+        print("Num Predictions: " + str(len(pred_list)))
+
+        # formating
+        pred_list = [pred[0] for pred in pred_list]
+
+        num_buttons = 0
+        for pred in pred_list:
+                if pred >= .5:
+                        num_buttons += 1
+                        x, y, w, h = to_check_coords[pred_list.index(pred)]
+                        cv.rectangle(image, (x, y), (x+w, y+h), (255, 0, 0), 1)
+        print("num_predicted_buttons: " + str(num_buttons))
+
         max_predict = max(pred_list)
         print(max_predict)
         max_pred_index = pred_list.index(max_predict)
-        x, y, w, h = recommended_boxes[max_pred_index]
+        x, y, w, h = to_check_coords[max_pred_index]
         cv.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 1)
         plt.imshow(image)
         plt.show()

@@ -22,7 +22,7 @@ def get_image_from_filepath():
                 exit()
 
         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-        image = cv.resize(image, (250, int(image.shape[1]*250/image.shape[0])))
+        image = cv.resize(image, (int(image.shape[1]*250/image.shape[0]), 250))
         return image
 
 def main():
@@ -41,8 +41,7 @@ def main():
         to_check_coords = []
         for x, y, w, h in recommended_boxes:
                 # adding recommended regions as images to array
-                # buttons will be somewhat square TODO: doesn't workz
-                if int(w / h * 10) in range(4, 16):
+                if int(w / h * 10) in range(7, 13):
                         box = image[y:y+h, x:x+w]
                         box = cv.resize(box, (128, 128))
                         to_check.append(box)
@@ -63,7 +62,7 @@ def main():
 
         num_buttons = 0
         for pred in pred_list:
-                if pred >= .5:
+                if pred >= .6:
                         num_buttons += 1
                         x, y, w, h = to_check_coords[pred_list.index(pred)]
                         cv.rectangle(image, (x, y), (x+w, y+h), (255, 0, 0), 1)

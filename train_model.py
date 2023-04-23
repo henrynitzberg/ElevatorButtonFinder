@@ -95,7 +95,7 @@ def main():
 
         # compiling the model
         model.compile(
-                optimizer=keras.optimizers.Adam(learning_rate=.0001),
+                optimizer=keras.optimizers.Adam(learning_rate=.001),
                 loss=keras.losses.BinaryCrossentropy(),
                 metrics=keras.metrics.BinaryAccuracy()
         )
@@ -105,7 +105,7 @@ def main():
         model.fit(
                 images,
                 labels,
-                batch_size=30,
+                batch_size=16,
                 epochs=25, 
                 verbose=0, 
                 validation_split=.2,

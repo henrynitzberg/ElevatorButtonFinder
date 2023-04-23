@@ -20,21 +20,13 @@ def get_data(data_dir, image_dims):
         images = []
         labels = [] # buttons = 1, not buttons = 0
         for label in os.listdir(data_dir):
-                if label == "button":
-                        for image in os.listdir(data_dir + "/" + label):
-                                image = cv.imread(data_dir + "/" + label + "/" + image)
-                                image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-                                image = cv.resize(image, image_dims)
-                                images.append(image)
-                                labels.append(1)
-                elif label == "not_button":
-                        for image in os.listdir(data_dir + "/" + label):
-                                image = cv.imread(data_dir + "/" + label + "/" + image)
-                                image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-                                image = cv.resize(image, image_dims)
-                                images.append(image)
-                                labels.append(0)
-
+                for image in os.listdir(data_dir + "/" + label):
+                        image = cv.imread(data_dir + "/" + label + "/" + image)
+                        image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+                        image = cv.resize(image, image_dims)
+                        images.append(image)
+                labels.append(1) if label == "button" else labels.append(0)
+                        
         images = np.array(images, dtype="float32")
         labels = np.array(labels, dtype="int32")
                 

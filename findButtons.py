@@ -1,3 +1,14 @@
+# 
+# findButtons.py
+# Henry Nitzberg
+# 4/24/2023
+#
+# This program uses a pretrained model to find buttons in an image
+# It uses selective search to find regions of interest, and then
+# uses the model to predict whether or not the region is a button
+# It outputs the origional image with blue circles on the predicted buttons
+#
+
 import matplotlib
 from matplotlib import pyplot as plt
 
@@ -13,6 +24,12 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 
+# get_image_from_filepath
+# Args: This function takes no arguments
+# Returns: This function returns a 3D numpy array representing an image
+# Notes: This function prompts the user for a file path to an image
+#        It then reads the image, converts it to RGB, and resizes it
+#        so the height is 250 pixels; width is scaled accordingly
 def get_image_from_filepath():
         image = input("File Path to Image: ")
         image = cv.imread(image)
@@ -25,21 +42,16 @@ def get_image_from_filepath():
         image = cv.resize(image, (int(image.shape[1]*250/image.shape[0]), 250))
         return image
 
-def main():
-        # Note on Usage: ./data/... will get image from data folder
-        # get image from command line
-        image = get_image_from_filepath()
-
-        selective_search = cv.ximgproc.segmentation.createSelectiveSearchSegmentation() # thanks again, google
-        selective_search.setBaseImage(image)
-
-         #quality seems to outperform fast search
-        selective_search.switchToSelectiveSearchQuality()
-
-        recommended_boxes = selective_search.process()
-        # shape: (x, y, w, h)
-
-         # adding recommended regions as images to array
+# get_model
+# Args: an image, and an array of coordinates of regions of interest
+# Returns: This function returns a tuple of two numpy arrays, the first is
+#          an array of images, the second is an array of the coordinates of the
+#          regions of interest
+# Notes: This functions narrows down the predictions with some common sense - 
+#        it only checks regions of interest that are a reasonable size and shape
+#        It also resizes the regions of interest to 128x128, the same size as
+#        the images the model was trained on
+def get_recommendations(image, recommended_boxes):
         to_check = []
         to_check_coords = []
         for x, y, w, h in recommended_boxes:
@@ -53,27 +65,30 @@ def main():
                         to_check_coords.append([x, y, w, h])
 
         to_check = np.array(to_check, dtype="float32")
+        return to_check, to_check_coords
 
-        # loading model
-        curr_path = os.getcwd()
-        model = keras.models.load_model(curr_path + "/model")
-        predictions = model.predict(to_check)
-
-        # max prediction should be the button
-        pred_list = predictions.tolist()
-        print("Num Predictions: " + str(len(pred_list)))
-
-        # formating
-        pred_list = [pred[0] for pred in pred_list]
-
+# get_centers
+# Args: an array of predictions, and an array of coordinates of regions of 
+#       interest
+# Returns: This function returns a tuple of two values, the first is the number
+#          of buttons predicted, the second is an array of the centers of the
+#          predicted buttons
+# Notes: This function gets the centers of the predicted buttons, if the
+#        prediction is above a certain threshold
+def get_centers(predictions, to_check_coords):
         num_buttons = 0
         center_points = []
-        for pred in pred_list:
+        for pred in predictions:
                 if pred >= .9:
-                        x, y, w, h = to_check_coords[pred_list.index(pred)]
-
+                        x, y, w, h = to_check_coords[predictions.index(pred)]
                         # rectangle around button guesses - good for debugging
-                        # cv.rectangle(image, (x, y), (x+w, y+h), (255, 0, 0), 1) 
+                        # model + select search
+                        # cv.rectangle(image, 
+                        #              (x, y), 
+                        #              (x+w, y+h), 
+                        #              (255, 0, 0), 
+                        #              1,
+                        #              ) 
 
                         # center point of button guesses - used for kmeans below
                         center_points.append([x + w/2, y + h/2])
@@ -81,19 +96,80 @@ def main():
 
         center_points = np.array(center_points, dtype="float32")
 
+        return num_buttons, center_points
+
+# get_precise_centers
+# Args: an array of centers of predicted buttons
+# Returns: This function returns an array of the centers of the predicted
+#          buttons, after running kmeans on them (with 2 classes, to represent
+#          the two buttons; up, and down)
+def get_precise_centers(center_points):
+        # credit: 
+        # https://docs.opencv.org/3.4/d1/d5c/tutorial_py_kmeans_opencv.html
+        criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+        _,_,centers=cv.kmeans(center_points,
+                              2,
+                              None,
+                              criteria,
+                              10,
+                              cv.KMEANS_RANDOM_CENTERS
+                             )
+        return centers
+
+# main method
+def main():
+        # get image from command line
+        image = get_image_from_filepath()
+
+        # get recommended regions of interest
+        selective_search = \
+                cv.ximgproc.segmentation.createSelectiveSearchSegmentation()
+        selective_search.setBaseImage(image)
+
+         #quality seems to outperform fast search
+        selective_search.switchToSelectiveSearchQuality()
+
+        recommended_boxes = selective_search.process()
+        # shape: [[x, y, w, h], ...]
+
+        # getting recommended regions as images in array, and their coordinates
+        to_check, to_check_coords = get_recommendations(image, 
+                                                        recommended_boxes
+                                                       )
+
+        # loading model
+        curr_path = os.getcwd()
+        model = keras.models.load_model(curr_path + "/model")
+
+        # classifying each region of interest
+        predictions = model.predict(to_check)
+
+        predictions = predictions.tolist()
+        print("Num Predictions: " + str(len(predictions)))
+
+        # formatting
+        predictions = [pred[0] for pred in predictions]
+
+        # finding centers of predicted buttons
+        num_buttons, center_points = get_centers(predictions, to_check_coords)
+
         if center_points == []:
                 print("No Buttons Found")
                 exit()
         elif num_buttons == 1:
                 print("Only 1 Button Found")
-                cv.circle(image, (int(center_points[0][0]), int(center_points[0][1])), 5, (0, 0, 255), -1)
+                cv.circle(image, 
+                          (int(center_points[0][0]), int(center_points[0][1])), 
+                          5, 
+                          (0, 0, 255), 
+                          -1,
+                         )
                 plt.imshow(image)
                 plt.show()
                 exit()
 
-        # credit: https://docs.opencv.org/3.4/d1/d5c/tutorial_py_kmeans_opencv.html
-        criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-        _,_,centers=cv.kmeans(center_points,2,None,criteria,10,cv.KMEANS_RANDOM_CENTERS)
+        # kmeans clustering to find more precise location of buttons
+        centers = get_precise_centers(center_points)
 
         print("predicted regions: " + str(num_buttons))
         for x, y in centers:

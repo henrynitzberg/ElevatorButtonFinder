@@ -148,8 +148,8 @@ def main():
         images, labels = get_data("data_bin", (128, 128))
 
         # data augmentation (~50 samples -> 1000 samples)
-        goalDataSize = 1000
-        augment_data(images, labels, goalDataSize)
+        goal_data_size = 1000
+        augment_data(images, labels, goal_data_size)
        
         # creating the model
         # The layers are as follows:

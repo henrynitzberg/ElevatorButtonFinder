@@ -15,12 +15,12 @@ Usage:
 ------
         The program can be run from the command line, then reads from 
         standard input:
-                python findButtons.py OR
-                path/to/image.jpg | python findButtons.py
+                python find_buttons.py OR
+                path/to/image.jpg | python find_buttons.py
 
         The classifier can be trained from the command line, but the
         repository comes with a trained model, so this is not required:
-                '**python train_bin_class.py**'
+                'python train_bin_class.py'
         train_bin_class.py requires that a directory named 'data' exists in the same
         directory as the script, and that it contains two subdirectories,
         'button' and 'not_button' with corresponding training images.

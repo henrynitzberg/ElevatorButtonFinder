@@ -18,12 +18,13 @@ Usage:
                 python findButtons.py OR
                 path/to/image.jpg | python findButtons.py
 
-        The binary classifier can be trained from the command line, but the
+        The classifier can be trained from the command line, but the
         repository comes with a trained model, so this is not required:
                 '**python train_bin_class.py**'
         train_bin_class.py requires that a directory named 'data' exists in the same
         directory as the script, and that it contains two subdirectories,
         'button' and 'not_button' with corresponding training images.
+        
         Required Libraries:
                 - numpy
                 - tensorflow
@@ -38,7 +39,7 @@ Modules:
                 This module is used to train the binary classifier (CNN) for the 
                 buttons. The current model is trained on a fairly small dataset
                 of ~150 images, augmented up to 1000.
-                Training and validation accuracy and is close to 100% but in
+                Training and validation accuracy is close to 100% but in
                 practice the model yields many false positives. 
         findButtons.py
                 This module is used to find the buttons in an image. It uses 

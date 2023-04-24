@@ -32,6 +32,11 @@ Usage:
                 - keras (tensorflow.keras)
                 - matplotlib
                 - os
+        Installing Required Libraries with Anacond
+                - enter base conda environment
+                - run 'conda env create -n elevatorEnv -f environment.yml'
+                - run 'conda activate elevatorEnv'
+                - to ensure it worked simply run 'python find_buttons.py'
 
 Modules:
 --------

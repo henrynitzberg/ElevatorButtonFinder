@@ -10,3 +10,4 @@ else
         echo "./testing_images/test$test_num.jpg" | python findButtons.py 
         
 fi
+ 

@@ -39,8 +39,8 @@ Modules:
                 This module is used to train the binary classifier (CNN) for the 
                 buttons. The current model is trained on a fairly small dataset
                 of ~150 images, augmented up to 1000.
-                Binary accuracy of training and validation is nearly 100% with 
-                very low loss, however in practice model yields many false 
+                Classification accuracy of training and validation is nearly 
+                100% with low loss, however in practice model yields many false 
                 positives. 
         findButtons.py
                 This module is used to find the buttons in an image. It uses 

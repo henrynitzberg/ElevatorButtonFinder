@@ -4,6 +4,7 @@ tf_env_command
 data_bin
 data_mult
 testing_images
+test.sh
 
 # temp
 modelv2

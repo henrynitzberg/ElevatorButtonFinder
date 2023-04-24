@@ -72,12 +72,6 @@ def main():
                         labels = np.append(labels, [labels[i]], axis=0)
         print("Data augmentation complete")
 
-        # plt.imshow(images[0].astype(np.uint8))
-        # plt.show()
-
-        # plt.imshow(images[originalDataSize].astype(np.uint8))
-        # plt.show()
-
         # creating the model
         # The layers are as follows:
         # Convolution -> Max Pooling -> Convolution -> Max Pooling ->

@@ -38,10 +38,12 @@ def main():
 
         recommended_boxes = selective_search.process()
         # shape: (x, y, w, h)
+
+         # adding recommended regions as images to array
         to_check = []
         to_check_coords = []
         for x, y, w, h in recommended_boxes:
-                # adding recommended regions as images to array
+                # restrict to reasonable sizes and dimensions 
                 if int(w / h * 10) in range(6, 14) \
                 and w < image.shape[1] / 2 and h < image.shape[0] / 2 \
                 and w > image.shape[1] / 10 and h > image.shape[0] / 10:
@@ -77,15 +79,23 @@ def main():
                         center_points.append([x + w/2, y + h/2])
                         num_buttons += 1
 
-        #pullng out center points of all boxes
         center_points = np.array(center_points, dtype="float32")
 
-        # totally ripped from tutorial (kmeans clustering to find predicted location of buttons)
-        criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
-        ret,label,centers=cv.kmeans(center_points,2,None,criteria,10,cv.KMEANS_RANDOM_CENTERS)
-        centes = centers.tolist()
+        if center_points == []:
+                print("No Buttons Found")
+                exit()
+        elif num_buttons == 1:
+                print("Only 1 Button Found")
+                cv.circle(image, (int(center_points[0][0]), int(center_points[0][1])), 5, (0, 0, 255), -1)
+                plt.imshow(image)
+                plt.show()
+                exit()
 
-        print("num_predicted_buttons: " + str(num_buttons))
+        # credit: https://docs.opencv.org/3.4/d1/d5c/tutorial_py_kmeans_opencv.html
+        criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+        _,_,centers=cv.kmeans(center_points,2,None,criteria,10,cv.KMEANS_RANDOM_CENTERS)
+
+        print("predicted regions: " + str(num_buttons))
         for x, y in centers:
                 cv.circle(image, (int(x), int(y)), 5, (0, 0, 255), -1)
 

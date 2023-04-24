@@ -15,8 +15,8 @@ Usage:
 ------
         The program can be run from the command line, then reads from 
         standard input:
-                '**python findButtons.py**' OR
-                '**path/to/image.jpg | python findButtons.py**'
+                __python findButtons.py__ OR
+                __path/to/image.jpg | python findButtons.py__
 
         The binary classifier can be trained from the command line, but the
         repository comes with a trained model, so this is not required:

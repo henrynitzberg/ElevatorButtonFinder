@@ -17,7 +17,7 @@ Usage:
         standard input:
                 'python findButtons.py' OR
                 'path/to/image.jpg | python findButtons.py'
-        \
+
         The binary classifier can be trained from the command line, but the
         repository comes with a trained model, so this is not required:
                 'python train_bin_class.py'

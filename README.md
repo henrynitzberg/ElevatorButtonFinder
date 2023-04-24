@@ -1,9 +1,7 @@
 ElevatorButtonFinder
+====================
 
-Henry Nitzberg
-
-4/24/2023
-
+Henry Nitzberg, 4/24/2023
 
 Purpose and Overview:
 

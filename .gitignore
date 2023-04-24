@@ -2,7 +2,6 @@ temp*
 push.sh
 test.sh
 tf_env_command
-data_bin
 data_mult
 testing_images
 

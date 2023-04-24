@@ -58,3 +58,5 @@ https://realpython.com/k-means-clustering-python/
 https://docs.opencv.org/3.4/d1/d5c/tutorial_py_kmeans_opencv.html
 
 https://keras.io/api/models/model_training_apis/
+
+https://learnopencv.com/selective-search-for-object-detection-cpp-python/

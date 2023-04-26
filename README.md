@@ -32,7 +32,7 @@ Usage:
                 - keras (tensorflow.keras)
                 - matplotlib
                 - os
-        Installing Required Libraries with Anacond
+        Installing Required Libraries with Anaconda
                 - enter base conda environment
                 - run 'conda env create -n elevatorEnv -f environment.yml'
                 - run 'conda activate elevatorEnv'
